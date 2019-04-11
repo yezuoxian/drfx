@@ -1,1 +1,1 @@
-# DRFX (Django Rest Framework X)
+# DRFX
