@@ -112,6 +112,3 @@ venv/
 # static files
 img/
 static/
-
-# migrations
-migrations/
