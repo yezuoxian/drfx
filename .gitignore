@@ -108,3 +108,7 @@ venv.bak/
 
 # venv
 venv/
+
+# static files
+img/
+static/
