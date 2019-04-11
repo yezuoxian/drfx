@@ -1,3 +1,5 @@
+from random import randint
+
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import generics
@@ -5,7 +7,7 @@ from rest_framework.parsers import JSONParser
 
 from . import models
 from . import serializers
-from .models import UserProfile, Product
+from .models import UserProfile, Product, Collocation
 from .serializers import UserProfileSerializer, ProductSerializer
 
 
@@ -18,7 +20,7 @@ class ClosetListView(generics.ListCreateAPIView):
 @csrf_exempt
 def user_profile_list(request):
     """
-    List all code snippets, or create a new snippet.
+    List all user profiles, or create a new user profile.
     """
     if request.method == 'GET':
         user_profile = UserProfile.objects.all()
@@ -37,7 +39,7 @@ def user_profile_list(request):
 @csrf_exempt
 def user_profile_detail(request, pk):
     """
-    Retrieve, update or delete a code snippet.
+    Retrieve, update or delete a user profile.
     """
     try:
         user_profile = UserProfile.objects.get(pk=pk)
@@ -64,7 +66,7 @@ def user_profile_detail(request, pk):
 @csrf_exempt
 def product_list(request):
     """
-    List all code snippets, or create a new snippet.
+    List all products, or create a new product.
     """
     if request.method == 'GET':
         product = Product.objects.all()
@@ -83,11 +85,11 @@ def product_list(request):
 @csrf_exempt
 def product_detail(request, pk):
     """
-    Retrieve, update or delete a code snippet.
+    Retrieve, update or delete a product.
     """
     try:
         product = Product.objects.get(pk=pk)
-    except UserProfile.DoesNotExist:
+    except Product.DoesNotExist:
         return HttpResponse(status=404)
 
     if request.method == 'GET':
@@ -105,3 +107,24 @@ def product_detail(request, pk):
     elif request.method == 'DELETE':
         product.delete()
         return HttpResponse(status=204)
+
+
+@csrf_exempt
+def collocation_list(request):
+    """
+    List all code collocations.
+    """
+    if request.method == 'GET':
+        collocation = Collocation.objects.all()
+        idx = randint(1, len(collocation))
+        random_collocation = Collocation.objects.get(pk=idx)
+        product_id = random_collocation.collocation.split(',')
+        products = []
+        for pid in product_id:
+            try:
+                product = Product.objects.get(pk=pid)
+                products.append(product)
+            except Product.DoesNotExist:
+                return HttpResponse(status=404)
+        serializer = ProductSerializer(products, many=True)
+        return JsonResponse(serializer.data, safe=False)
