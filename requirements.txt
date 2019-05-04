@@ -1,0 +1,7 @@
+Django
+django-allauth
+django-rest-auth
+django-rest-framework
+djangorestframework
+mysqlclient
+Pillow
