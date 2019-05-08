@@ -116,15 +116,18 @@ def collocation_list(request):
     """
     if request.method == 'GET':
         collocation = Collocation.objects.all()
-        idx = randint(1, len(collocation))
+        all_id = []
+        for col in collocation:
+            all_id.append(int(col.id))
+        idx = randint(min(all_id), max(all_id))
         random_collocation = Collocation.objects.get(pk=idx)
         product_id = random_collocation.collocation.split(',')
         products = []
         for pid in product_id:
             try:
-                product = Product.objects.get(pk=pid)
+                product = Product.objects.get(pk=int(pid))
                 products.append(product)
             except Product.DoesNotExist:
-                return HttpResponse(status=404)
+                return HttpResponse(status=500)
         serializer = ProductSerializer(products, many=True)
         return JsonResponse(serializer.data, safe=False)

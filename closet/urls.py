@@ -9,5 +9,4 @@ urlpatterns = [
     path('product/', views.product_list),
     path('product/<int:pk>/', views.product_detail),
     path('collocation/', views.collocation_list),
-
 ]

@@ -26,6 +26,7 @@ class UserProfile(models.Model):
 class Product(models.Model):
     product_name = models.CharField(max_length=100)
     category = models.CharField(max_length=2, choices=CATEGORY_CHOICES)
+    specific_type = models.CharField(max_length=50)
     image = models.ImageField(upload_to='img')
     hyperlink = models.URLField()
 
