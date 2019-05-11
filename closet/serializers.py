@@ -42,7 +42,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ('product_name', 'category', 'image', 'hyperlink',)
+        fields = ('product_name', 'category', 'specific_type', 'image', 'hyperlink',)
 
 
 class CollocationSerializer(serializers.ModelSerializer):

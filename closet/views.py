@@ -1,5 +1,6 @@
-from random import randint
+import json
 
+import numpy as np
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import generics
@@ -112,22 +113,35 @@ def product_detail(request, pk):
 @csrf_exempt
 def collocation_list(request):
     """
-    List all code collocations.
+    List a number of collocations.
     """
+    size = 5
     if request.method == 'GET':
         collocation = Collocation.objects.all()
         all_id = []
         for col in collocation:
             all_id.append(int(col.id))
-        idx = randint(min(all_id), max(all_id))
-        random_collocation = Collocation.objects.get(pk=idx)
-        product_id = random_collocation.collocation.split(',')
-        products = []
-        for pid in product_id:
-            try:
-                product = Product.objects.get(pk=int(pid))
-                products.append(product)
-            except Product.DoesNotExist:
-                return HttpResponse(status=500)
-        serializer = ProductSerializer(products, many=True)
-        return JsonResponse(serializer.data, safe=False)
+        if len(collocation) < size:
+            return HttpResponse(status=500)
+        all_rand_ids = np.random.randint(low=0, high=len(all_id), size=size)
+        # print(all_rand_ids)
+        all_products = []
+        for idx in all_rand_ids:
+            random_collocation = Collocation.objects.get(pk=all_id[idx])
+            product_id = random_collocation.collocation.split(',')
+            products = []
+            for pid in product_id:
+                try:
+                    product = Product.objects.get(pk=int(pid))
+                    product_js = {'product_name': product.product_name,
+                                  'category': product.category,
+                                  'image': product.image.url,
+                                  'hyperlink': product.hyperlink,
+                                  'specific_type': product.specific_type,
+                                  'tag': product.tag.split(',')}
+                    products.append(product_js)
+                except Product.DoesNotExist:
+                    return HttpResponse(status=500)
+            # serializer = ProductSerializer(products, many=True)
+            all_products.append(products)
+        return HttpResponse(json.dumps(all_products), content_type="application/json")
