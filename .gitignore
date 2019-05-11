@@ -110,7 +110,7 @@ venv.bak/
 venv/
 
 # static files
-img/
+media/
 static/
 
 # setting
