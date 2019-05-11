@@ -1,4 +1,5 @@
 import json
+import random
 
 import numpy as np
 from django.http import HttpResponse, JsonResponse
@@ -133,15 +134,33 @@ def collocation_list(request):
             for pid in product_id:
                 try:
                     product = Product.objects.get(pk=int(pid))
-                    product_js = {'product_name': product.product_name,
-                                  'category': product.category,
-                                  'image': product.image.url,
-                                  'hyperlink': product.hyperlink,
-                                  'specific_type': product.specific_type,
-                                  'tag': product.tag.split(',')}
+                    product_js = {
+                        'id': product.id,
+                        'product_name': product.product_name,
+                        'category': product.category,
+                        'image': product.image.url,
+                        'hyperlink': product.hyperlink,
+                        'specific_type': product.specific_type,
+                        'tag': product.tag.split(',')}
                     products.append(product_js)
                 except Product.DoesNotExist:
                     return HttpResponse(status=500)
             # serializer = ProductSerializer(products, many=True)
             all_products.append(products)
         return HttpResponse(json.dumps(all_products), content_type="application/json")
+
+
+@csrf_exempt
+def modify_collocation(request, pk):
+    """
+    Modify the collocation by changing clothe or pants.
+    """
+    size = 5
+    cur = Product.objects.get(pk=int(pk))
+    new_product = []
+    for c in list(Product.objects.filter(category=cur.category)):
+        new_product.append(c)
+    rand_list = [cur]
+    rand_list += random.sample(new_product, size - 1)
+    serializer = ProductSerializer(rand_list, many=True)
+    return JsonResponse(serializer.data, safe=False)
